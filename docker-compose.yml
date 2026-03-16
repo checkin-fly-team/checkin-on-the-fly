@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PHP-FPM Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: checkin_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - checkin_network
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-checkin}
+      - DB_USERNAME=${DB_USERNAME:-laravel}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: checkin_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    networks:
+      - checkin_network
+    depends_on:
+      - app
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: checkin_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-checkin}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - checkin_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: checkin_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - checkin_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+
+  # Node.js for Frontend Build (Development)
+  node:
+    image: node:20-alpine
+    container_name: checkin_node
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - "5173:5173"
+    networks:
+      - checkin_network
+    command: npm run dev
+
+networks:
+  checkin_network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
