@@ -56,7 +56,7 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 # Entrypoint script (runs migrations then starts services)
 COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 80
 
