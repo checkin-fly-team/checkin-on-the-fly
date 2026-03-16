@@ -39,7 +39,8 @@ COPY . .
 COPY --from=node-builder /app/public/build ./public/build
 
 # Install PHP dependencies (production only)
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+# --no-scripts skips artisan commands that require a full environment at build time
+RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
