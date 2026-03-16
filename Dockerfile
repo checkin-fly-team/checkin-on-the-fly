@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 # --- Stage 2: PHP + Nginx runtime ---
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Install nginx and system dependencies
 RUN apk add --no-cache \
