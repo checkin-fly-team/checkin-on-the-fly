@@ -46,8 +46,10 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader --no-script
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
 
-# Nginx config
+# Nginx config (copy to both possible locations for Alpine compatibility)
+RUN mkdir -p /etc/nginx/http.d /etc/nginx/conf.d
 COPY docker/nginx/conf.d/app.conf /etc/nginx/http.d/default.conf
+COPY docker/nginx/conf.d/app.conf /etc/nginx/conf.d/default.conf
 
 # Supervisor config to run both php-fpm and nginx
 COPY docker/supervisord.conf /etc/supervisord.conf
