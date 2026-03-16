@@ -1,36 +1,60 @@
-FROM php:8.2-fpm
+# --- Stage 1: Node build ---
+FROM node:20-alpine AS node-builder
 
-# Set working directory
-WORKDIR /var/www
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# --- Stage 2: PHP + Nginx runtime ---
+FROM php:8.2-fpm-alpine
+
+# Install nginx and system dependencies
+RUN apk add --no-cache \
+    nginx \
     git \
     curl \
     libpng-dev \
-    libonig-dev \
+    oniguruma-dev \
     libxml2-dev \
     zip \
     unzip \
     libzip-dev \
-    && rm -rf /var/lib/apt/lists/*
+    icu-dev \
+    supervisor
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy application files
-COPY . /var/www
+WORKDIR /var/www
 
-# Install PHP dependencies
+# Copy app source
+COPY . .
+
+# Copy built frontend assets from node stage
+COPY --from=node-builder /app/public/build ./public/build
+
+# Install PHP dependencies (production only)
 RUN composer install --no-interaction --no-dev --optimize-autoloader
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
-# Expose port
-EXPOSE 9000
+# Nginx config
+COPY docker/nginx/conf.d/app.conf /etc/nginx/http.d/default.conf
 
-CMD ["php-fpm"]
+# Supervisor config to run both php-fpm and nginx
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+# Entrypoint script (runs migrations then starts services)
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/entrypoint.sh"]
