@@ -34,8 +34,8 @@ services:
     container_name: checkin_nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
@@ -58,7 +58,7 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "${DB_HOST_PORT:-3306}:3306"
     networks:
       - checkin_network
     healthcheck:
@@ -72,7 +72,7 @@ services:
     container_name: checkin_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - checkin_network
     healthcheck:
@@ -88,7 +88,7 @@ services:
     volumes:
       - ./:/var/www
     ports:
-      - "5173:5173"
+      - "${VITE_PORT:-5173}:5173"
     networks:
       - checkin_network
     command: npm run dev
