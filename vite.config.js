@@ -11,4 +11,14 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    // ignore bootstrap warnings
+    css: {
+        preprocessorOptions: {
+            scss: {
+                quietDeps: true,
+            },
+        },
+    },
 });
+
+

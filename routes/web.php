@@ -1,10 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home.public');
+
+Auth::routes();
+
+Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard')->middleware('auth');
+
 
 // TODO: add auth middleware
 
