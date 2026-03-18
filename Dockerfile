@@ -7,14 +7,8 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev libicu-dev g++ libevent-dev procps \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath sockets intl
 
-# Swoole is installed from GitHub
-RUN curl -L -o swoole.tar.gz https://github.com/swoole/swoole-src/archive/refs/tags/v5.1.0.tar.gz \
-    && tar -xf swoole.tar.gz \
-    && cd swoole-src-5.1.0 \
-    && phpize \
-    && ./configure \
-    && make -j$(nproc) \
-    && make install \
+# Install a PHP 8.4-compatible Swoole release from PECL
+RUN printf "\n" | pecl install swoole \
     && docker-php-ext-enable swoole
 
 # Node.js 18 (Vite compatible)
