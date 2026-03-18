@@ -8,3 +8,5 @@
 .env
 .git
 .gitignore
+/public/hot
+/public/build

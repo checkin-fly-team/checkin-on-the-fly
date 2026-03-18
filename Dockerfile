@@ -41,7 +41,8 @@ COPY . .
 RUN composer dump-autoload --optimize
 
 # Vite build
-RUN npm run build
+RUN rm -f public/hot \
+ && npm run build
 
 # Laravel config cache (to be done at runtime, not during build)
 RUN php artisan config:clear \
