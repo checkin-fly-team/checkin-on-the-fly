@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Http\Request;
+
 
 class HomeController extends Controller implements HasMiddleware
 {
@@ -11,23 +15,23 @@ class HomeController extends Controller implements HasMiddleware
     {
         return [
             'auth', // Aplica a todos os métodos
-            // ou com opções: new Middleware('auth', only: ['index']),
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('dashboard.events');
+        $user = Auth::user();
+
+        // Sort by Event date
+        $query = Event::withMin('intervals', 'date')
+            ->orderBy('intervals_min_date', 'asc');
+
+        $myEvents = (clone $query)->where('organizer_id', $user->id)->get();
+        $sharedEvents = (clone $query)
+            ->whereHas('teamUsers', fn($q) => $q->where('user_id', $user->id))
+            ->where('organizer_id', '!=', $user->id)
+            ->get();
+
+        return view('dashboard.events', compact('myEvents', 'sharedEvents'));
     }
-
-
-//     public function __construct()
-//     {
-//         $this->middleware('auth');
-//     }
-
-//     public function index()
-//     {
-//         return view('home');
-//     }
 }

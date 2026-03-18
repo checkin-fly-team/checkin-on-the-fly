@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Event extends Model
 {
@@ -38,6 +39,11 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'event_team', 'event_id', 'user_id')
             ->withPivot(['role', 'assigned_at']);
+    }
+
+    public function getAuthUserRoleAttribute()
+    {
+        return $this->teamUsers->where('id', Auth::id())->first()?->pivot->role;
     }
 
     public function intervals(): HasMany

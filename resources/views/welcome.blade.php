@@ -34,14 +34,14 @@
                 <div class="card h-100 shadow-sm border-0 bg-dark text-white p-4">
                     <h3>{{ __('Dashboard Inteligente') }}</h3>
                     <p>{{ __('Controle todos os seus eventos num único lugar com métricas em tempo real.') }}</p>
-                    <img src="{{ asset('images/stock_forest.jpg') }}" class="img-fluid rounded">
+                    <img src="{{ asset('images/placeholder.jpg') }}" class="img-fluid rounded">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card h-100 shadow-sm border-0 p-4">
                     <h3>{{ __('Check-in Rápido') }}</h3>
                     <p>{{ __('Valide entradas na porta através do scanner de QR Code em qualquer dispositivo.') }}</p>
-                    <img src="{{ asset('images/stock_forest.jpg') }}" class="img-fluid rounded">
+                    <img src="{{ asset('images/placeholder.jpg') }}" class="img-fluid rounded">
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <img src="{{ asset('images/stock_forest.jpg') }}" class="img-fluid rounded shadow-lg" alt="Dashboard">
+                    <img src="{{ asset('images/placeholder.jpg') }}" class="img-fluid rounded shadow-lg" alt="Dashboard">
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <img src="{{ asset('images/stock_forest.jpg') }}" class="img-fluid rounded shadow-lg" alt="Marketing">
+                    <img src="{{ asset('images/placeholder.jpg') }}" class="img-fluid rounded shadow-lg" alt="Marketing">
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
             <div class="row g-4 text-center">
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
-                        <img src="{{ asset('images/stock_forest.jpg') }}" class="card-img-top" alt="Conferência">
+                        <img src="{{ asset('images/placeholder.jpg') }}" class="card-img-top" alt="Conferência">
                         <div class="card-body">
                             <h5>{{ __('Conferências Tech') }}</h5>
                         </div>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
-                        <img src="{{ asset('images/stock_forest.jpg') }}" class="card-img-top" alt="Workshops">
+                        <img src="{{ asset('images/placeholder.jpg') }}" class="card-img-top" alt="Workshops">
                         <div class="card-body">
                             <h5>{{ __('Workshops Académicos') }}</h5>
                         </div>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm">
-                        <img src="{{ asset('images/stock_forest.jpg') }}" class="card-img-top" alt="Festivais">
+                        <img src="{{ asset('images/placeholder.jpg') }}" class="card-img-top" alt="Festivais">
                         <div class="card-body">
                             <h5>{{ __('Festivais e Lazer') }}</h5>
                         </div>

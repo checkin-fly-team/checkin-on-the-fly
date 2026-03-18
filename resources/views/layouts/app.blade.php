@@ -88,7 +88,7 @@
             </div>
         </nav>
 
-        <main class="d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+        <main class="d-flex" style="min-height: 75vh;">
             @yield('content')
         </main>
     </div>

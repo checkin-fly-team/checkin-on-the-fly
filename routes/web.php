@@ -12,9 +12,6 @@ Auth::routes();
 
 Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard')->middleware('auth');
 
-
-// TODO: add auth middleware
-
 /* Participant */
 Route::get('/view/{event}/{eventName?}', null)->name('event.landing'); // event landing page
 Route::post('/register/{event}', null)->name('event.register'); // register for event (name, email, phone)

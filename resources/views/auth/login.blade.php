@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container d-flex justify-content-center">
+<div class="container d-flex justify-content-center  align-items-center justify-content-center">
     <div class="login-card p-5 shadow-sm">
         <div class="text-center mb-4">
             <h1 class="fw-bolder mb-0" style="font-size: 4.5rem; letter-spacing: -2px;">{{ __('Login') }}</h1>
