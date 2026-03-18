@@ -1,36 +1,58 @@
-FROM php:8.2-fpm
+FROM php:8.4-cli AS base
 
-# Set working directory
-WORKDIR /var/www
-
-# Install system dependencies
+# System packages and PHP extensions
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libzip-dev \
-    && rm -rf /var/lib/apt/lists/*
+    git unzip curl libpng-dev libonig-dev libxml2-dev \
+    libzip-dev libpq-dev libcurl4-openssl-dev libssl-dev \
+    zlib1g-dev libicu-dev g++ libevent-dev procps \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath sockets intl
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Install a PHP 8.4-compatible Swoole release from PECL
+RUN printf "\n" | pecl install swoole \
+    && docker-php-ext-enable swoole
 
-# Install Composer
+# Node.js 22 (required by current Vite)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
+# Composer installation
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy application files
-COPY . /var/www
+WORKDIR /var/www
 
-# Install PHP dependencies
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+# Copy composer files and artisan file
+COPY composer.json composer.lock artisan ./
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www
+# Create Laravel's basic directory structure
+RUN mkdir -p bootstrap/cache storage/app storage/framework/cache/data \
+    storage/framework/sessions storage/framework/views storage/logs
 
-# Expose port
+# Install Composer dependencies (without post-scripts)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+
+# Node files (cache for Vite build)
+COPY package.json package-lock.json ./
+RUN npm install --no-audit --no-fund --include=optional
+
+# Copy the rest of the project files
+COPY . .
+
+# Run Composer post-scripts
+RUN composer dump-autoload --optimize
+
+# Vite build
+RUN rm -f public/hot \
+ && npm run build
+
+# Laravel config cache (to be done at runtime, not during build)
+RUN php artisan config:clear \
+ && php artisan route:clear \
+ && php artisan view:clear
+
+# File permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+ && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["sh", "-c", "rm -f public/hot && echo 'APP_KEY:' $APP_KEY && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan octane:start --server=swoole --host=0.0.0.0 --port=9000"]
