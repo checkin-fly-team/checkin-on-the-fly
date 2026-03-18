@@ -50,19 +50,9 @@ RUN php artisan config:clear \
  && php artisan view:clear
 
 # File permissions
-RUN chown -R www-data:www-data /var/www \
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
  && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
-
-# Startup script
-RUN echo '#!/bin/bash\n\
-# Cache configurations after environment variables are loaded\n\
-php artisan config:cache\n\
-php artisan route:cache\n\
-php artisan view:cache\n\
-# Start the server\n\
-exec php artisan octane:start --server=swoole --host=0.0.0.0 --port=9000\n\
-' > /start.sh && chmod +x /start.sh
 
 CMD ["sh", "-c", "echo 'APP_KEY:' $APP_KEY && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan octane:start --server=swoole --host=0.0.0.0 --port=9000"]
