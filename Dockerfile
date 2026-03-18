@@ -37,6 +37,9 @@ RUN npm install --no-audit --no-fund --include=optional
 # Copy the rest of the project files
 COPY . .
 
+# Remove any pre-generated local cache manifests copied from source
+RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+
 # Run Composer post-scripts
 RUN composer dump-autoload --optimize
 
