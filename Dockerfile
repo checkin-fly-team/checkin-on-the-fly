@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
 RUN printf "\n" | pecl install swoole \
     && docker-php-ext-enable swoole
 
-# Node.js 18 (Vite compatible)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+# Node.js 22 (required by current Vite)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
 # Composer installation
@@ -32,7 +32,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 # Node files (cache for Vite build)
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm install --no-audit --no-fund --include=optional
 
 # Copy the rest of the project files
 COPY . .
