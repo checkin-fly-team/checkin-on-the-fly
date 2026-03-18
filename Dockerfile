@@ -40,8 +40,7 @@ COPY . .
 # Remove any pre-generated local cache manifests copied from source
 RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
 
-# Run Composer post-scripts
-RUN composer dump-autoload --optimize
+# Composer autoload is already optimized by the install step above.
 
 # Vite build
 RUN rm -f public/hot \
